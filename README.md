@@ -57,42 +57,98 @@ $ pnpm run test:e2e
 $ pnpm run test:cov
 ```
 
-## Deployment
+## 🧾 NestJS 도메인 단위 폴더 구조 & 네이밍/Git/커밋 룰
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### 1. 폴더 구조 예시 (도메인 단위)
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+```
+src/
+  user/
+    user.controller.ts
+    user.service.ts
+    user.module.ts
+    dto/
+      create-user.dto.ts
+      update-user.dto.ts
+    entity/
+      user.entity.ts
+    user.repository.ts
+    user.util.ts
+    user.controller.spec.ts
+  auth/
+    auth.controller.ts
+    auth.service.ts
+    auth.module.ts
+    dto/
+      login.dto.ts
+    entity/
+      auth.entity.ts
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- 각 도메인(user, auth 등) 폴더에 해당 도메인 관련 파일을 모두 모은다!
+- dto, entity 등은 하위 폴더로 분리해 관리한다!
+- 테스트 파일(.spec.ts)도 도메인 폴더 안에 위치!
 
-## Resources
+---
 
-Check out a few resources that may come in handy when working with NestJS:
+### 2. 네이밍 컨벤션 (NestJS 도메인 구조 기준)
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+| 항목        | 방식        | 예시                                       |
+| ----------- | ----------- | ------------------------------------------ |
+| 도메인 폴더 | kebab-case  | user, auth, product                        |
+| 하위 폴더   | kebab-case  | dto, entity, util                          |
+| 파일명      | kebab-case  | user.service.ts, create-user.dto.ts        |
+| 클래스명    | PascalCase  | UserService, AuthController, CreateUserDto |
+| 변수/함수   | camelCase   | getUserById, accessToken                   |
+| 환경변수    | UPPER_SNAKE | DB_HOST, JWT_SECRET, PORT                  |
 
-## Support
+- DTO, Entity, Service, Controller 등은 PascalCase + 접미사(Dto, Entity, Service, Controller)!
+- 파일명은 kebab-case + 접미사(dto, service, controller 등)!
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
+### 3. Git 브랜치 네이밍 규칙
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+| 목적      | 네이밍 규칙 예시                            |
+| --------- | ------------------------------------------- |
+| 기능 개발 | feature/{기능-설명} → feature/user-auth-api |
+| 버그 수정 | fix/{버그-설명} → fix/invalid-token-error   |
+| 문서 작업 | docs/{문서-내용} → docs/api-docs-update     |
+| 핫픽스    | hotfix/{이슈-설명} → hotfix/prod-db-conn    |
 
-## License
+- 브랜치명은 영어 소문자, kebab-case 사용 권장!
+- 도메인명/기능명 등으로 명확하게 작성!
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+---
+
+### 4. Git 브랜치 전략
+
+| 브랜치명   | 목적             |
+| ---------- | ---------------- |
+| main       | 배포 전용 브랜치 |
+| develop    | 통합 개발 브랜치 |
+| feature/\* | 기능 개발 단위   |
+| fix/\*     | 버그 수정        |
+| docs/\*    | 문서 관련        |
+
+---
+
+### 5. 커밋 메시지 컨벤션
+
+| 태그     | 의미           |
+| -------- | -------------- |
+| Feat     | ✨ 기능 추가   |
+| Fix      | 🐛 버그 수정   |
+| Style    | 💄 스타일 변경 |
+| Docs     | 📝 문서 변경   |
+| Refactor | 🔨 리팩토링    |
+| Test     | ✅ 테스트 코드 |
+| Chore    | 🔧 기타 설정   |
+
+- 커밋 메시지 예시:
+  ```
+  ✨ Feat: 유저 회원가입 API 구현
+  🐛 Fix: 토큰 만료 예외 처리
+  ```
+
+---
