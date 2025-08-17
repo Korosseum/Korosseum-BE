@@ -7,6 +7,44 @@ import { generateColosseumNickname } from 'src/lib/utils';
 export class UserService {
   constructor(private configService: ConfigService) {}
 
+  async findByEmailOrSave(email: string, data: any) {
+    const user = await db.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+        email: true,
+        provider: true,
+        providerId: true,
+        photo: true,
+        nickname: true,
+        nicknameIndex: true,
+      },
+    });
+
+    if (!user) {
+      const randomNickname = generateColosseumNickname();
+      return db.user.create({
+        data: {
+          ...data,
+          nickname: randomNickname,
+        },
+        select: {
+          id: true,
+          email: true,
+          provider: true,
+          providerId: true,
+          photo: true,
+          nickname: true,
+          nicknameIndex: true,
+        },
+      });
+    } else {
+      return user;
+    }
+  }
+
   findAll() {
     return db.user.findMany();
   }
