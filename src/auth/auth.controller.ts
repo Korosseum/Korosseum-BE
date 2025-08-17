@@ -49,8 +49,10 @@ export class AuthController {
           },
         });
 
+        console.log('✨refreshToken : ', refreshToken);
+
         if (!refreshToken) {
-          return { user: null };
+          throw new UnauthorizedException('Refresh token not found');
         } else {
           if (refreshToken.expiresAt < new Date()) {
             // 기한 지난 토큰 삭제 (자동 로그인 해제)

@@ -31,7 +31,7 @@ model User {
   opinion Opinion[]
   post Post[]
   RefreshToken RefreshToken[]
-
+  file File[]
   @@unique([provider, id])
 }
 
@@ -55,10 +55,8 @@ model VerificationToken {
 // 토론 주제(방) 정보
 model Post {
   id             Int        @id @default(autoincrement()) // 토론 고유 ID
-  author         User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId       String
-  title          String     // 제목
-  content    String     // 설명
+  userId         String
+  content        String     // 내용
   sideA          String?    // A의견(선택)
   sideB          String?    // B의견(선택)
   sideC          String?    // C의견(선택)
@@ -71,8 +69,9 @@ model Post {
   isActive       Boolean    // 활성화 여부
   createdAt      DateTime   @default(now()) // 생성일
   updatedAt      DateTime   @updatedAt @default(now()) // 수정일
-  type           String     @default("debate") // 토론 타입(custom, debate)
-  category       String     // 카테고리
+  type           String     @default("debate") // 타입(debate, ...any)
+  topic          String     @default("custom") // 토픽
+  user           User @relation(fields: [userId], references: [id], onDelete: Cascade)
   opinions       Opinion[]  // 토론에 달린 의견(댓글)
   post_user    post_user[] // 토론 참가자 목록(다대다)
   post_like   post_like[] // 토론 좋아요 목록(다대다)
@@ -89,7 +88,8 @@ model post_like {
 
 model File{
   id String @id @default(cuid())
-  ownerId String 
+  userId String 
+  ownerId Int 
   ownerType String // post, comment, opinion ···
   fieldname String
   originalname String
@@ -99,8 +99,11 @@ model File{
   filename String
   path String
   size Int
+  index Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([ownerId, ownerType, index])
 }
 
 // 토론 참가자 중간 테이블(다대다 관계, 역할 포함)
@@ -109,7 +112,6 @@ model post_user {
   userId     String   // 유저 ID
   post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade) // 토론과 연결
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade) // 유저와 연결
-  role       String   @default("guest") // 참가자 역할(guest, host 등)
   createdAt  DateTime @default(now()) // 생성일
   updatedAt  DateTime @updatedAt // 수정일
 

@@ -29,12 +29,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any) {
     // JWT 페이로드에서 사용자 정보 검증
-    console.log('✨payload : ', payload);
     const user = await db.user.findUnique({
       where: { id: payload.id },
     });
-
-    console.log('✨payload : ', payload);
 
     if (!user) {
       throw new UnauthorizedException('사용자를 찾을 수 없습니다.');
