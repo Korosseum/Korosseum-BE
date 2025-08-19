@@ -87,7 +87,7 @@ export class UserService {
       });
 
       return {
-        status: 'success',
+        ok: 'success',
         message: 'Nickname generated successfully',
         data: result,
       };

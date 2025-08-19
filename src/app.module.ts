@@ -12,7 +12,7 @@ import { JwtAuthGuard } from './auth/guards/jwt.guard';
 // import { APP_GUARD } from '@nestjs/core';
 
 @Module({
-  imports: [config, UserModule, PostModule, AuthModule],
+  imports: [...config, UserModule, PostModule, AuthModule],
   controllers: [AppController],
   // providers: [{ provide: APP_GUARD, useClass: NextAuthJwtGuard }, AppService],
   providers: [AppService, { provide: APP_GUARD, useClass: JwtAuthGuard }],

@@ -1,13 +1,10 @@
-import { Injectable, UseGuards } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { CreatePostDto } from './dto/create-post.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
-import multer from 'multer';
+import { Injectable } from '@nestjs/common';
+
 import { db } from 'src/lib/db';
 
 @Injectable()
 export class PostService {
-  constructor(private configService: ConfigService) {}
+  constructor() {}
 
   async create(user: any, files: any, body: any) {
     const { id } = user;
@@ -29,7 +26,7 @@ export class PostService {
       if (!newPost) {
         throw new Error('Failed to create post');
       }
-      console.log('✨newPost', newPost);
+
       const postUser = await tx.post_user.create({
         data: {
           userId: id,
@@ -40,7 +37,6 @@ export class PostService {
         throw new Error('Failed to create post user');
       }
 
-      console.log('✨postUser', postUser);
       const postFiles = await tx.file.createMany({
         data: files.map((file: any, index: number) => ({
           userId: id,
@@ -60,9 +56,9 @@ export class PostService {
       if (!postFiles) {
         throw new Error('Failed to create post files');
       }
-      console.log('✨postFiles', postFiles);
       return { newPost, postUser, postFiles };
     });
-    return {};
+    console.log('✨post', post);
+    return { ok: true, data: post };
   }
 }
