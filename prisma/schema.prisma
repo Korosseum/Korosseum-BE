@@ -91,13 +91,9 @@ model File{
   userId String 
   ownerId Int 
   ownerType String // post, comment, opinion ···
-  fieldname String
-  originalname String
-  encoding String
-  mimetype String
-  destination String
-  filename String
-  path String
+  originalName String
+  type String
+  url String
   size Int
   index Int
   createdAt DateTime @default(now())
@@ -121,13 +117,12 @@ model post_user {
 // 토론 의견(댓글)
 model Opinion {
   id        Int      @id @default(autoincrement()) // 의견 고유 ID
-  content   String   // 의견 내용
+  text   String   // 의견 내용
   likes     Int      @default(0) // 좋아요 수
   updatedAt DateTime @updatedAt // 수정일
   createdAt DateTime @default(now()) // 생성일
   userId    String   // 작성자 ID
   postId  Int      // 토론 ID
-
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) // 작성자와 연결
   post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade) // 토론과 연결
   opinion_like opinion_like[] // 의견 좋아요 목록(다대다)

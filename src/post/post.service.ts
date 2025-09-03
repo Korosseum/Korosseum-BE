@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
 
 import { db } from 'src/lib/db';
+import { CreatePostDto } from './dto/create-post.dto';
 
 @Injectable()
 export class PostService {
   constructor() {}
 
-  async create(user: any, files: any, body: any) {
+  async create(user: any, body: CreatePostDto) {
     const { id } = user;
-    const { content, topic } = body;
+    const { content, topic, files } = body;
     console.log('✨user', user);
-    console.log('✨files', files);
+
     console.log('✨body', body);
 
     const post = await db.$transaction(async (tx) => {
@@ -42,14 +43,10 @@ export class PostService {
           userId: id,
           ownerId: newPost.id,
           ownerType: 'post',
-          fieldname: file.fieldname,
-          originalname: file.originalname,
-          encoding: file.encoding,
-          mimetype: file.mimetype,
-          destination: file.destination,
-          filename: file.filename,
+          originalName: file.originalName,
+          type: file.type,
+          url: file.url,
           size: file.size,
-          path: file.path,
           index: index,
         })),
       });
@@ -60,5 +57,44 @@ export class PostService {
     });
     console.log('✨post', post);
     return { ok: true, data: post };
+  }
+
+  async getPost(id: string) {
+    const post = await db.post.findUnique({
+      where: { id: Number(id) },
+
+      include: {
+        opinions: {
+          include: {
+            user: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            nickname: true,
+            photo: true,
+          },
+        },
+      },
+    });
+    if (!post) {
+      return { ok: false, message: 'Post not found' };
+    }
+
+    const files = await db.file.findMany({
+      where: {
+        ownerId: post.id,
+        ownerType: 'post',
+      },
+    });
+
+    if (!files) {
+      return { ok: false, message: 'Files not found' };
+    }
+
+    const data = { ...post, files };
+
+    return { ok: true, data };
   }
 }

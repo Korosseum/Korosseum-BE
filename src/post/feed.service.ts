@@ -5,7 +5,7 @@ import { db } from 'src/lib/db';
 export class FeedService {
   constructor() {}
 
-  async getFeeds() {
+  async getFeeds(user?: any) {
     const posts = await db.post.findMany({
       where: {
         isActive: true,
@@ -16,6 +16,16 @@ export class FeedService {
       take: 10,
       include: {
         user: true,
+        post_like: {
+          where: {
+            userId: user?.id,
+          },
+        },
+        _count: {
+          select: {
+            post_like: true,
+          },
+        },
       },
     });
 
@@ -36,6 +46,8 @@ export class FeedService {
         files: allFiles.filter((file) => file.ownerId === post.id),
       };
     });
+
+    // console.log('✨feeds', feeds);
 
     return { ok: true, data: feeds };
   }

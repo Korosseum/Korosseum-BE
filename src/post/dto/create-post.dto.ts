@@ -1,13 +1,14 @@
 export class CreatePostDto {
-  title: string;
   content: string;
-  sideA?: string;
-  sideB?: string;
-  sideC?: string;
-  sideD?: string;
-  sideE?: string;
-  sideF?: string;
-  sideG?: string;
-  type?: string;
-  category: string;
+  topic: string;
+  files: File[];
+}
+
+interface File {
+  id: string;
+  url: string;
+  originalName: string;
+  index: number;
+  type: string;
+  size: number;
 }

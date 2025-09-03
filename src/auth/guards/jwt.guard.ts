@@ -15,20 +15,29 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
   canActivate(context: ExecutionContext) {
     // Public 데코레이터가 있는 경우 인증 생략
+    // const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
+    //   context.getHandler(),
+    //   context.getClass(),
+    // ]);
+
+    // console.log('✨isPublic', context);
+
+    // if (isPublic) {
+    //   return true;
+    // }
+
+    return super.canActivate(context);
+  }
+
+  handleRequest(err, user, info, context: ExecutionContext) {
     const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
       context.getHandler(),
       context.getClass(),
     ]);
 
     if (isPublic) {
-      return true;
-    }
-
-    return super.canActivate(context);
-  }
-
-  handleRequest(err, user, info) {
-    if (err || !user) {
+      return user || null;
+    } else if (err || !user) {
       throw err || new UnauthorizedException('유효하지 않은 토큰입니다.');
     }
     return user;

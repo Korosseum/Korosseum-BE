@@ -18,7 +18,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             ?.split('; ')
             .find((row) => row.startsWith('accessToken='));
 
-          console.log('✨accessToken : ', accessToken);
           return accessToken ? accessToken.split('=')[1] : null;
         },
       ]),

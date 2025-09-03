@@ -18,10 +18,6 @@ export class S3Service {
     // 각각 파일들 / 파일 타입 / 업로드 폴더
     const { files, type, folder } = body;
 
-    console.log('✨files', files);
-    console.log('✨type', type);
-    console.log('✨folder', folder);
-
     try {
       const commands = files.map(async (file: any) => {
         // 현재 파일 타입
@@ -50,14 +46,17 @@ export class S3Service {
           Key: key,
         });
 
-        return { id: file.id, command };
+        const publicUrl = `https://${this.configService.get('AMPLIFY_BUCKET')}.s3.ap-northeast-2.amazonaws.com/${key}`;
+
+        console.log('✨publicUrl', publicUrl);
+        return { id: file.id, command, publicUrl };
       });
 
       console.log('✨commands', commands);
 
-      const presignedUrlObj = {};
+      const resultData = {};
 
-      const presignedUrls = await Promise.all(
+      await Promise.all(
         commands.map(async (v) => {
           const presignedUrl = await getSignedUrl(
             this.s3Client,
@@ -67,12 +66,18 @@ export class S3Service {
             },
           );
 
-          presignedUrlObj[(await v).id] = presignedUrl;
+          resultData[(await v).id] = {
+            presignedUrl,
+            publicUrl: (await v).publicUrl,
+          };
         }),
       );
 
-      return { ok: true, data: { presignedUrls: presignedUrlObj } };
+      console.log('✨resultData', resultData);
+
+      return { ok: true, data: resultData };
     } catch (error) {
+      console.error(error);
       return { ok: false, error: error.message };
     }
   }

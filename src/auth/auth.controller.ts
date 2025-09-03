@@ -36,6 +36,8 @@ export class AuthController {
         secret: this.configService.get('ACCESS_SECRET'),
       });
 
+      console.log('✨decodedUser', decodedUser);
+
       if (!decodedUser) {
         return res.json({ user: null });
       } else {
@@ -48,8 +50,6 @@ export class AuthController {
             expiresAt: true,
           },
         });
-
-        console.log('✨refreshToken : ', refreshToken);
 
         if (!refreshToken) {
           throw new UnauthorizedException('Refresh token not found');

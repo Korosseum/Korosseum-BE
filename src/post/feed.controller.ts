@@ -1,6 +1,6 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Req } from '@nestjs/common';
 import { FeedService } from './feed.service';
-import { Public } from 'src/auth/public.decorator';
+import { Public, User } from 'src/auth/public.decorator';
 
 @Controller('feed')
 export class FeedController {
@@ -8,10 +8,7 @@ export class FeedController {
 
   @Get()
   @Public()
-  async getFeeds(): Promise<any> {
-    const result = await this.feedService.getFeeds();
-
-    console.log('✨result', result);
-    return result;
+  async getFeeds(@User() user: any, @Req() req: Request): Promise<any> {
+    return await this.feedService.getFeeds(user);
   }
 }
